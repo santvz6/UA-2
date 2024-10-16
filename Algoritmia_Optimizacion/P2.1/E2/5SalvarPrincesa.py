@@ -11,10 +11,10 @@ def salvar_princesa(mazmorra: np.array, max_daño = 0):
     [   |   |   |   ]     [   |   |   |   ]
     
     Movimientos Disponibles: Este, Sur
-    Este: i+1 -> Quitar la columna 0
-    Sur: j+1 -> Quitar la fila 0
+    Este: j+1 -> Quitar la columna 0
+    Sur: i+1 -> Quitar la fila 0
 
-    Cada camino tiene que tener una lista que guarde la menor cantidad que llegó a obtener
+    Cada camino tiene que tener ALGO que guarde la menor cantidad que llegó a obtener
     """
     mazmorra = np.atleast_2d(mazmorra)
     maximos_daño = list()
@@ -27,8 +27,7 @@ def salvar_princesa(mazmorra: np.array, max_daño = 0):
     
     # Mapa tamaño ix1
     if np.shape(mazmorra)[1] == 1:
-        # Limitado a moverse al Sur / Vector columna
-        
+        # Limitado a moverse al Sur / Vector columna    
         if mazmorra[1, 0] + max_daño < max_daño:
             max_daño += mazmorra[1, 0]
 
