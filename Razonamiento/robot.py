@@ -40,7 +40,7 @@ class Robot:
         self.heading = pose[2]
     
     def getPose(self):
-        return (self.coordX, self.coordY, self.heading)
+        return (self.coordX, self.coordY, self.heading, self.actualLinearVel, self.actualAngularVel)
 
     def setVel(self, velocidades):
 
@@ -91,7 +91,7 @@ class Robot:
         # calculamos cuántos grados hay que girar por el tiempo que ha pasado (si W>0)
         #   obtenemos el ICC y aplicamos la rotación
         #   o calculamos la traslación en linea recta también ponderada por el tiempo que ha pasado
-        if self.actualAngularVel != 0:
+        if abs(self.actualAngularVel) > 0.000001:
             if self.actualLinearVel != 0:
                 ICCRad = self.actualLinearVel/self.actualAngularVel
                 

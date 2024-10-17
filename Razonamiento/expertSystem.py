@@ -8,8 +8,7 @@ class ExpertSystem:
         self.objetivoAlcanzado = False
         self.segmentoObjetivo = None
 
-        self.velocidad_actual = 0  # Velocidad lineal actual aproximada
-        self.velocidad_inicial = 0
+
         self.ultimo_tiempo = time.time()  # Tiempo de la última actualización para calcular el tiempo transcurrido
         self.VACC = 1  # Aceleración máxima del robot (m/s^2)
         self.VMAX = 3  # Velocidad máxima del robot (m/s)
@@ -28,24 +27,24 @@ class ExpertSystem:
         self.ultimo_tiempo = actual
 
         # Coordenadas del robot
-        xR, yR, theta = poseRobot
+        xR, yR, theta, vR, wR = poseRobot
 
-
+        retraso = 1.2 * vR
         # Si el robot ha alcanzado el punto más cercano, dirigirse al punto final del segmento
         if self.inicioAlcanzado:
             xObj, yObj = self.segmentoObjetivo.getFin()
             distancia_final = math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)
 
-            if distancia_final < 0.2:  # Umbral para considerar que hemos alcanzado el punto final
+            
+            if distancia_final < (vR**2 - retraso)/2:  # Umbral para considerar que hemos alcanzado el punto final
                 self.objetivoAlcanzado = True
 
         else:
             xObj, yObj = self.punto_cercano(poseRobot)    
             distancia_inicio = math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)
 
-            if distancia_inicio < 0.2:  # Umbral para considerar que alcanzó el punto más cercano
+            if distancia_inicio < (vR**2 - retraso)/2:  # Umbral para considerar que alcanzó el punto más cercano
                 self.inicioAlcanzado = True  # Se considera el punto más cercano como alcanzado
-                self.velocidad_actual = 0
 
         # Calcular el ángulo hacia el punto objetivo (punto más cercano o punto final)
         angulo_objetivo = math.degrees(math.atan2(yObj - yR, xObj - xR))
@@ -58,45 +57,16 @@ class ExpertSystem:
         elif error_angular < -180:
             error_angular += 360
 
-        
+        k_angular = 0.02
+        w_angular = k_angular * error_angular
+        # Limitar la velocidad angular máxima
+        w_angular = max(-2, min(2, w_angular))  # Evitar giros muy bruscos
 
-        if self.inicioAlcanzado and not self.objetivoAlcanzado:
-            # Controlador proporcional para la velocidad angular
-            k_angular = 0.1  # Aumentar la ganancia para ser más sensible a la orientación
-            w_angular = k_angular * error_angular
+        k_lineal = 0.90  # Aumentar la ganancia para ser más sensible a la orientación
+        v_lineal = 1/abs(error_angular/90) * k_lineal
+        # Limitar la velocidad angular máxima
+        v_lineal = max(0, min(3, v_lineal))  # Evitar giros muy bruscos
 
-            # Limitar la velocidad angular máxima
-            w_angular = max(-2, min(2, w_angular))  # Evitar giros muy bruscos
-
-        else:
-            if abs(error_angular) > 80:
-                w_angular = 3
-            elif abs(error_angular) > 40:
-                w_angular = 2
-            elif abs(error_angular) > 20:
-                w_angular = 1
-            elif abs(error_angular) > 5:
-                w_angular = 0.1
-            else:
-                w_angular = 0
-            w_angular = -w_angular if error_angular <= 0 else w_angular
-
-            if abs(error_angular) < 5:
-                # VELOCIDAD ACTUAL -> v = v0 + at
-                self.velocidad_actual = min(self.velocidad_inicial + self.VACC * tiempo_transcurrido, 3)
-                self.velocidad_inicial = self.velocidad_actual
-
-                # ACELERANDO
-                v_lineal = self.velocidad_actual
-
-            else:
-                v_lineal = 0
-
-        P = (self.velocidad_actual**2 ) / 2
-
-        if math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)+1 < P:
-            # Si está cerca de la línea, reducir la velocidad para mantener la precisión
-            v_lineal = 0  # Velocidad baja para corrección   
 
         return (v_lineal, w_angular)
 
@@ -155,3 +125,6 @@ class ExpertSystem:
         punto_cercano = np.array([xA, yA]) + t * AB
 
         return (punto_cercano[0], punto_cercano[1])
+
+    def hayParteOptativa(self):
+        return True
