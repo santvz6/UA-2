@@ -57,7 +57,7 @@ class ExpertSystem:
         elif error_angular < -180:
             error_angular += 360
 
-        k_angular = 0.045
+        k_angular = 0.05
         w_angular = k_angular * error_angular
         # Limitar la velocidad angular máxima
         w_angular = max(-2, min(2, w_angular))  # Evitar giros muy bruscos
