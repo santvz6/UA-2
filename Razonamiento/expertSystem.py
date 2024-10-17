@@ -7,57 +7,48 @@ class ExpertSystem:
     def __init__(self) -> None:
         self.objetivoAlcanzado = False
         self.segmentoObjetivo = None
+
         self.velocidad_actual = 0  # Velocidad lineal actual aproximada
-        self.last_update_time = time.time()  # Tiempo de la última actualización para calcular el tiempo transcurrido
+        self.velocidad_inicial = 0
+        self.ultimo_tiempo = time.time()  # Tiempo de la última actualización para calcular el tiempo transcurrido
         self.VACC = 1  # Aceleración máxima del robot (m/s^2)
         self.VMAX = 3  # Velocidad máxima del robot (m/s)
-        self.puntoCercano = False  # Variable para detectar el punto más cercano alcanzado
+        self.inicioAlcanzado = False  # Variable para detectar el punto más cercano alcanzado
 
     def setObjetivo(self, segmento):
-        self.puntoCercano = False
+        self.inicioAlcanzado = False
         self.objetivoAlcanzado = False
         self.segmentoObjetivo = segmento
 
     def tomarDecision(self, poseRobot):
-        """
-        Controla el movimiento del robot para acercarse a la línea objetivo
-        y seguir hasta el final una vez alcanzado el punto más cercano.
-        """
+
         # Calcular el tiempo transcurrido desde la última actualización
-        current_time = time.time()
-        time_elapsed = current_time - self.last_update_time
-        self.last_update_time = current_time
+        actual = time.time()
+        tiempo_transcurrido = actual - self.ultimo_tiempo
+        self.ultimo_tiempo = actual
 
         # Coordenadas del robot
         xR, yR, theta = poseRobot
 
-        # Calcular el punto más cercano en la trayectoria al robot
-        punto_mas_cercano = self.punto_cercano(poseRobot)
-        xC, yC = punto_mas_cercano
-
-        # Calcular la distancia al punto más cercano
-        distancia_a_punto_mas_cercano = math.sqrt((xR - xC) ** 2 + (yR - yC) ** 2)
 
         # Si el robot ha alcanzado el punto más cercano, dirigirse al punto final del segmento
-        if self.puntoCercano:
-            punto_final = self.segmentoObjetivo.getFin()
-            distancia_a_final = math.sqrt((xR - punto_final[0]) ** 2 + (yR - punto_final[1]) ** 2)
+        if self.inicioAlcanzado:
+            xObj, yObj = self.segmentoObjetivo.getFin()
+            distancia_final = math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)
 
-            if distancia_a_final < 0.2:  # Umbral para considerar que hemos alcanzado el punto final
+            if distancia_final < 0.2:  # Umbral para considerar que hemos alcanzado el punto final
                 self.objetivoAlcanzado = True
-                print("Objetivo alcanzado, el robot ha llegado al punto final.")
-                return (0, 0)  # Parar el robot cuando alcance el punto final
 
-            # Actualizar el objetivo a seguir al punto final del segmento
-            xC, yC = punto_final
         else:
-            # Si aún no ha alcanzado el punto más cercano, seguir dirigiéndose hacia él
-            if distancia_a_punto_mas_cercano < 0.2:  # Umbral para considerar que alcanzó el punto más cercano
-                self.puntoCercano = True  # Se considera el punto más cercano como alcanzado
-                print("Punto más cercano alcanzado, dirigiéndose al punto final.")
+            xObj, yObj = self.punto_cercano(poseRobot)    
+            distancia_inicio = math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)
+
+            if distancia_inicio < 0.2:  # Umbral para considerar que alcanzó el punto más cercano
+                self.inicioAlcanzado = True  # Se considera el punto más cercano como alcanzado
+                self.velocidad_actual = 0
 
         # Calcular el ángulo hacia el punto objetivo (punto más cercano o punto final)
-        angulo_objetivo = math.degrees(math.atan2(yC - yR, xC - xR))
+        angulo_objetivo = math.degrees(math.atan2(yObj - yR, xObj - xR))
         angulo_robot = theta % 360
 
         # Calcular el error angular y ajustarlo al rango [-180, 180]
@@ -67,30 +58,45 @@ class ExpertSystem:
         elif error_angular < -180:
             error_angular += 360
 
-        # Controlador proporcional para la velocidad angular
-        k_angular = 0.1  # Aumentar la ganancia para ser más sensible a la orientación
-        w_angular = k_angular * error_angular
+        
 
-        # Limitar la velocidad angular máxima
-        w_angular = max(-2, min(2, w_angular))  # Evitar giros muy bruscos
+        if self.inicioAlcanzado and not self.objetivoAlcanzado:
+            # Controlador proporcional para la velocidad angular
+            k_angular = 0.1  # Aumentar la ganancia para ser más sensible a la orientación
+            w_angular = k_angular * error_angular
 
-        # Actualizar la velocidad actual del robot usando la aceleración conocida
-        if self.velocidad_actual < self.VMAX:
-            self.velocidad_actual += self.VACC * time_elapsed
-            self.velocidad_actual = min(self.velocidad_actual, self.VMAX)
+            # Limitar la velocidad angular máxima
+            w_angular = max(-2, min(2, w_angular))  # Evitar giros muy bruscos
 
-        # Calcular la distancia de frenado utilizando la velocidad estimada
-        distancia_frenado = (self.velocidad_actual ** 2) / (2 * self.VACC)
-
-        # Fase de aproximación con reducción gradual de velocidad
-        distancia_actual = math.sqrt((xR - xC) ** 2 + (yR - yC) ** 2)
-
-        # Siempre mantener el robot a menos de 0.001 de la línea
-        if distancia_a_punto_mas_cercano > 0.001: 
-            v_lineal = min(self.VMAX, 1.5)  # Velocidad alta para acercarse rápidamente
         else:
+            if abs(error_angular) > 80:
+                w_angular = 3
+            elif abs(error_angular) > 40:
+                w_angular = 2
+            elif abs(error_angular) > 20:
+                w_angular = 1
+            elif abs(error_angular) > 5:
+                w_angular = 0.1
+            else:
+                w_angular = 0
+            w_angular = -w_angular if error_angular <= 0 else w_angular
+
+            if abs(error_angular) < 5:
+                # VELOCIDAD ACTUAL -> v = v0 + at
+                self.velocidad_actual = min(self.velocidad_inicial + self.VACC * tiempo_transcurrido, 3)
+                self.velocidad_inicial = self.velocidad_actual
+
+                # ACELERANDO
+                v_lineal = self.velocidad_actual
+
+            else:
+                v_lineal = 0
+
+        P = (self.velocidad_actual**2 ) / 2
+
+        if math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)+1 < P:
             # Si está cerca de la línea, reducir la velocidad para mantener la precisión
-            v_lineal = 0.5  # Velocidad baja para corrección
+            v_lineal = 0  # Velocidad baja para corrección   
 
         return (v_lineal, w_angular)
 
@@ -99,7 +105,7 @@ class ExpertSystem:
     
     def calcularAngulo(self, xRobot, yRobot):
         xR, yR = xRobot, yRobot
-        xObj, yObj = self.segmentoObjetivo.getFin() if self.puntoCercano else self.segmentoObjetivo.getInicio()
+        xObj, yObj = self.segmentoObjetivo.getFin() if self.inicioAlcanzado else self.segmentoObjetivo.getInicio()
         
         cateto1 = xObj - xR if xObj >= xR else xR - xObj
         cateto2 = yObj - yR if yObj >= yR else yR - yObj
@@ -124,7 +130,7 @@ class ExpertSystem:
         return True if giroNegativo >= giroPositivo else False
     
     def alcanzado(self, poseRobot, dist):
-        objetivo = self.segmentoObjetivo.getFin() if self.puntoCercano else self.punto_cercano(poseRobot)
+        objetivo = self.segmentoObjetivo.getFin() if self.inicioAlcanzado else self.punto_cercano(poseRobot)
         return objetivo[0] - dist < poseRobot[0] < objetivo[0] + dist and objetivo[1] - dist < poseRobot[1] < objetivo[1] + dist
     
     def punto_cercano(self, poseRobot):
