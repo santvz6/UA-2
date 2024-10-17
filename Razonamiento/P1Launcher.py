@@ -16,6 +16,10 @@ from segmento import *
 from expertSystem import *
 AppTitle = "RRDC P1 2024"
 
+import csv
+import pandas as pd
+
+
 RADIUS = 8 # Radio de dibujo para los puntos objetivo
 
 
@@ -144,10 +148,15 @@ objectiveSet.append(triangulo)
 
 numPath = 0
 
+######################################################################################
+k_lineal = 0.75
+k_angular = 0.05
+retraso = 1.5
 
-experto = ExpertSystem()
+experto = ExpertSystem(k_lineal, k_angular, retraso)
 experto.setObjetivo(objectiveSet[numPath])
 optativo = experto.hayParteOptativa()
+######################################################################################
 
 miRobot.setPose((1,10,-10))
 
@@ -160,6 +169,19 @@ segmentScore = ()
 totalScore = 0
 
 timePerFrame = []
+
+dict_datos = {
+    "k_lineal": [k_lineal],
+    "k_angular": [k_angular],
+    "retraso": [retraso],
+    "puntuacion": [0],
+    "s1": [0],
+    "s2": [0],
+    "s3": [0],
+    "s4": [0],
+    "s5": [0],
+    "s6": [0],
+}
 
 while running:
 
@@ -191,10 +213,28 @@ while running:
             miRobot.setVel((0,0))
             running = False
         else:
+            # Recta
             if objectiveSet[numPath].getType()==1:
                 segmentScore = getSegmentScore(objectiveSet[numPath], trayectoria, elapsedTime)
+            # Triángulo
             else:
                 segmentScore = getTriangleScore(objectiveSet[numPath], trayectoria, elapsedTime)
+
+            match(numPath):
+                case 0:
+                    dict_datos["s1"] = [segmentScore[0]]
+                case 1:
+                    dict_datos["s2"] = [segmentScore[0]]
+                case 2:
+                    dict_datos["s3"] = [segmentScore[0]]
+                case 3:
+                    dict_datos["s4"] = [segmentScore[0]]
+                case 4:
+                    dict_datos["s5"] = [segmentScore[0]]
+                case 5:
+                    dict_datos["s6"] = [segmentScore[0]]
+                    
+
             trayectoria.clear()
             totalScore += segmentScore[0]
             print(f'Puntuación del segmento: {segmentScore[0]}. Puntuación de distancia: {segmentScore[1]} en {segmentScore[2]} segundos')
@@ -213,6 +253,7 @@ while running:
 
 
 print(f'Puntuación total: {totalScore}')
+dict_datos["puntuacion"] = totalScore
 
 trajCont = 1
 while not programQuit:
@@ -222,6 +263,18 @@ while not programQuit:
         if event.type == pygame.QUIT:
             pygame.image.save(screen, "Recorrido.png")
             time.sleep(1)
+
+            # Creación DataFrame
+            try:
+                df = pd.read_csv("datos.csv")
+            except FileNotFoundError as e:
+                df = pd.DataFrame(dict_datos)
+                df.to_csv("datos.csv", index=False)
+            else:
+                df_nuevo = pd.DataFrame(dict_datos)
+                df = pd.concat([df, df_nuevo], ignore_index=True)
+                df.to_csv("datos.csv", index=False)
+
             programQuit = True
 
     # fill the screen with a color to wipe away anything from last frame

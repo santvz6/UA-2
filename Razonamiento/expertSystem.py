@@ -4,15 +4,15 @@ import numpy as np
 import time
 
 class ExpertSystem:
-    def __init__(self) -> None:
-        self.objetivoAlcanzado = False
+    def __init__(self, k_lineal, k_angular, retraso) -> None:
         self.segmentoObjetivo = None
 
-
-        self.ultimo_tiempo = time.time()  # Tiempo de la última actualización para calcular el tiempo transcurrido
-        self.VACC = 1  # Aceleración máxima del robot (m/s^2)
-        self.VMAX = 3  # Velocidad máxima del robot (m/s)
+        self.objetivoAlcanzado = False
         self.inicioAlcanzado = False  # Variable para detectar el punto más cercano alcanzado
+
+        self.k_lineal = k_lineal
+        self.k_angular = k_angular
+        self.retraso = retraso
 
     def setObjetivo(self, segmento):
         self.inicioAlcanzado = False
@@ -20,14 +20,8 @@ class ExpertSystem:
         self.segmentoObjetivo = segmento
 
     def tomarDecision(self, poseRobot):
-
-        # Calcular el tiempo transcurrido desde la última actualización
-        actual = time.time()
-        tiempo_transcurrido = actual - self.ultimo_tiempo
-        self.ultimo_tiempo = actual
-
         # Coordenadas del robot
-        xR, yR, theta, vR, wR = poseRobot
+        xR, yR, angR, vR, wR = poseRobot
 
         retraso = 1.2 * vR
         # Si el robot ha alcanzado el punto más cercano, dirigirse al punto final del segmento
@@ -48,7 +42,7 @@ class ExpertSystem:
 
         # Calcular el ángulo hacia el punto objetivo (punto más cercano o punto final)
         angulo_objetivo = math.degrees(math.atan2(yObj - yR, xObj - xR))
-        angulo_robot = theta % 360
+        angulo_robot = angR % 360
 
         # Calcular el error angular y ajustarlo al rango [-180, 180]
         error_angular = angulo_objetivo - angulo_robot
@@ -73,36 +67,7 @@ class ExpertSystem:
     def esObjetivoAlcanzado(self):
         return self.objetivoAlcanzado
     
-    def calcularAngulo(self, xRobot, yRobot):
-        xR, yR = xRobot, yRobot
-        xObj, yObj = self.segmentoObjetivo.getFin() if self.inicioAlcanzado else self.segmentoObjetivo.getInicio()
-        
-        cateto1 = xObj - xR if xObj >= xR else xR - xObj
-        cateto2 = yObj - yR if yObj >= yR else yR - yObj
 
-        hipotenusa = math.sqrt(cateto1**2 + cateto2**2)
-
-        angulo = math.degrees(math.acos(cateto1 / hipotenusa))
-
-        if xObj >= xR and yObj >= yR:
-            return angulo
-        elif xObj >= xR and yObj < yR:
-            return 360 - angulo
-        elif xObj < xR and yObj >= yR:
-            return 180 - angulo
-        elif xObj < xR and yObj < yR:
-            return 180 + angulo
-
-    def orientacionGiro(self, angRobot: float, angObj: float):
-        giroNegativo = abs(angObj - angRobot) if angRobot > angObj else abs(360 - angObj + angRobot) 
-        giroPositivo = abs(360 - angRobot + angObj) if angRobot > angObj else abs(angObj - angRobot)
-        
-        return True if giroNegativo >= giroPositivo else False
-    
-    def alcanzado(self, poseRobot, dist):
-        objetivo = self.segmentoObjetivo.getFin() if self.inicioAlcanzado else self.punto_cercano(poseRobot)
-        return objetivo[0] - dist < poseRobot[0] < objetivo[0] + dist and objetivo[1] - dist < poseRobot[1] < objetivo[1] + dist
-    
     def punto_cercano(self, poseRobot):
         # Coordenadas del robot
         xR, yR = poseRobot[0], poseRobot[1]
@@ -113,10 +78,10 @@ class ExpertSystem:
 
         # Vector del segmento (B - A)
         AB = np.array([xB - xA, yB - yA])
-        AP = np.array([xR - xA, yR - yA])
+        AR = np.array([xR - xA, yR - yA])
 
         # Proyección de AP sobre AB
-        t = np.dot(AP, AB) / np.dot(AB, AB)
+        t = np.dot(AR, AB) / np.dot(AB, AB)
 
         # Limitar t al rango [0, 1] para asegurar que el punto proyectado esté dentro del segmento
         t = max(0, min(1, t))
