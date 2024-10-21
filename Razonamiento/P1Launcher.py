@@ -16,9 +16,7 @@ from segmento import *
 from expertSystem import *
 AppTitle = "RRDC P1 2024"
 
-import csv
-import pandas as pd
-
+import sys
 
 RADIUS = 8 # Radio de dibujo para los puntos objetivo
 
@@ -148,12 +146,24 @@ objectiveSet.append(triangulo)
 
 numPath = 0
 
-######################################################################################
-k_lineal = 0.75
-k_angular = 0.05
-retraso = 1.5
+#####################################################################################
+print("Argumentos recibidos:", sys.argv)
 
-experto = ExpertSystem(k_lineal, k_angular, retraso)
+kR_lineal = float(sys.argv[1])
+kR_angular = float(sys.argv[2])
+retrasoR = float(sys.argv[3])
+
+kT_lineal = float(sys.argv[4])
+kT_angular = float(sys.argv[5])
+retrasoT = float(sys.argv[6])
+
+wMAX = float(sys.argv[7])
+hayTruco = False if sys.argv[8] == "False" else True
+
+
+experto = ExpertSystem(kR_lineal, kR_angular, retrasoR, 
+                       kT_lineal, kT_angular, retrasoT, 
+                       wMAX, hayTruco)
 experto.setObjetivo(objectiveSet[numPath])
 optativo = experto.hayParteOptativa()
 ######################################################################################
@@ -170,18 +180,28 @@ totalScore = 0
 
 timePerFrame = []
 
+########################################################################################
 dict_datos = {
-    "k_lineal": [k_lineal],
-    "k_angular": [k_angular],
-    "retraso": [retraso],
-    "puntuacion": [0],
-    "s1": [0],
-    "s2": [0],
-    "s3": [0],
-    "s4": [0],
-    "s5": [0],
-    "s6": [0],
+    "puntuacion": f"{totalScore:.7f}",  # 7 decimales
+    "Truco" : str(hayTruco).ljust(5, ' '),
+    "kRe_V": f"{kR_lineal:.3f}",        # 3 decimales
+    "kRe_W": f"{kR_angular:.3f}",
+    "Ret-": f"{retrasoR:.2f}",           # 2 decimales
+    "segm1": f"{0:.3f}",
+    "segm3": f"{0:.3f}",
+    "segm5": f"{0:.3f}",
+    "kTr_V": f"{kT_lineal:.3f}",
+    "kTr_W": f"{kT_angular:.3f}",
+    "RetΔ": f"{retrasoT:.2f}",
+    "segm2": f"{0:.3f}",
+    "segm4": f"{0:.3f}",
+    "segm6": f"{0:.3f}",
+    "WMAX" : f"{wMAX:.2f}",
 }
+
+
+inicio = time.time()
+########################################################################################
 
 while running:
 
@@ -220,21 +240,13 @@ while running:
             else:
                 segmentScore = getTriangleScore(objectiveSet[numPath], trayectoria, elapsedTime)
 
-            match(numPath):
-                case 0:
-                    dict_datos["s1"] = [segmentScore[0]]
-                case 1:
-                    dict_datos["s2"] = [segmentScore[0]]
-                case 2:
-                    dict_datos["s3"] = [segmentScore[0]]
-                case 3:
-                    dict_datos["s4"] = [segmentScore[0]]
-                case 4:
-                    dict_datos["s5"] = [segmentScore[0]]
-                case 5:
-                    dict_datos["s6"] = [segmentScore[0]]
-                    
+########################################################################################
+            if dict_datos["segm1"] != str(None):
+                puntSegm = f"{segmentScore[0]:.3f}"
+                dict_datos["segm"+str(numPath+1)] = puntSegm
+########################################################################################
 
+                    
             trayectoria.clear()
             totalScore += segmentScore[0]
             print(f'Puntuación del segmento: {segmentScore[0]}. Puntuación de distancia: {segmentScore[1]} en {segmentScore[2]} segundos')
@@ -248,12 +260,19 @@ while running:
     else:
         velocidades = experto.tomarDecision(miRobot.getPose())
         miRobot.setVel(velocidades)
+########################################################################################
+        if time.time() - inicio > 120: # 2 minutos
+            for key, _ in dict_datos.items():
+                dict_datos[key] = str(None)
+            experto.objetivoAlcanzadoTrue()
+########################################################################################
+
     # flip() the display to put your work on screen
     pygame.display.flip()
 
 
 print(f'Puntuación total: {totalScore}')
-dict_datos["puntuacion"] = totalScore
+dict_datos["puntuacion"] = f"{totalScore:.7f}"
 
 trajCont = 1
 while not programQuit:
@@ -261,20 +280,13 @@ while not programQuit:
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.image.save(screen, "Recorrido.png")
-            time.sleep(1)
 
-            # Creación DataFrame
-            try:
-                df = pd.read_csv("datos.csv")
-            except FileNotFoundError as e:
-                df = pd.DataFrame(dict_datos)
-                df.to_csv("datos.csv", index=False)
-            else:
-                df_nuevo = pd.DataFrame(dict_datos)
-                df = pd.concat([df, df_nuevo], ignore_index=True)
-                df.to_csv("datos.csv", index=False)
-
+########################################################################################
+            # Creación/Edición del DataFrame
+            experto.añadirFila(nueva_fila=dict_datos, nombre="datos.csv")
+            # Creación Captura de Pantalla
+            pygame.image.save(screen, "Recorridos/ID"+ str(experto.getmaxID(nombre="datos.csv")) + ".png")    
+########################################################################################
             programQuit = True
 
     # fill the screen with a color to wipe away anything from last frame
@@ -296,6 +308,9 @@ while not programQuit:
             p1 = (trayectoriaTotal[cont-1][0]*10, sizeY-trayectoriaTotal[cont-1][1]*10)
             p2 = (trayectoriaTotal[cont][0]*10, sizeY-trayectoriaTotal[cont][1]*10)
             pygame.draw.line(screen, "red", p1, p2, 2)
+
+        pygame.event.post(pygame.event.Event(pygame.QUIT))
+
     pygame.display.flip()
 
     timeLapse = clock.tick(60)  
