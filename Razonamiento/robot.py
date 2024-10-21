@@ -116,4 +116,3 @@ class Robot:
             angleRad = self.heading * math.pi / 180
             self.coordX = self.coordX + dist*math.cos(angleRad)
             self.coordY = self.coordY + dist*math.sin(angleRad)
-

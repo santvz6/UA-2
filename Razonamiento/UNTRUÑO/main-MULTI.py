@@ -1,12 +1,13 @@
 import subprocess
 import pandas as pd
 import numpy as np
+import json
 
 # Ruta completa del intérprete de Python dentro del entorno virtual
 python_path = "/home/sant_vz6/Escritorio/UA-2/Razonamiento/.venv/bin/python"
 
 ################################ PARAMETROS ###############################################
-NUM_P = 3
+NUM_P= 2
 
 kR_lineal = np.linspace(0.700, 0.800, NUM_P) # [0.700, 0.750, 0.800] 
 kR_angular = np.linspace(0.055, 0.065, NUM_P)  # [0.055, 0.060, 0.065]
@@ -18,11 +19,6 @@ retrasoT = np.linspace(0.90, 1.10, NUM_P) # [0.90, 1.00, 1.10]
 
 wM = 2.00 # np.linspace(1.90, 2.10, 5)
 hayTruco:bool = False
-
-################################ CREACIÓN ARCHIVO CSV ###############################################
-
-nombre = "datos.csv"
-
 
 ################################ FUNCIONES ###############################################
 
@@ -41,6 +37,7 @@ def existeFila(nombre:str, fila: list) -> bool:
         return False
          
 
+filas = list()
 ################################ MAIN ###############################################
 for kRl in kR_lineal:
     for kRa in kR_angular:
@@ -49,14 +46,14 @@ for kRl in kR_lineal:
                 for kTa in kT_angular:
                     for retT in retrasoT:
                         fila = [kRl, kRa, retR, kTl, kTa, retT, wM]
-                        if not existeFila("datos.csv", fila):
-                            # Ejecuta el archivo .py que deseas ejecutar en bucle con parámetros
-                            result = subprocess.run([
-                                python_path, "P1Launcher.py",
-                                str(kRl), str(kRa), str(retR),
-                                str(kTl), str(kTa), str(retT),
-                                str(wM), str(hayTruco)
-                            ])
+                        if not existeFila("datos2.csv", fila):
+                            filas.append(fila + [str(hayTruco)])
                         else:
                             print("Ya se ha ejecutado anteriormente:", fila)
                             continue
+
+
+# Convertimos la lista de listas a JSON
+filas_json = json.dumps(filas)
+# Ejecuta el archivo .py que deseas ejecutar en bucle con parámetros
+result = subprocess.run([python_path, "P1Launcher-MULTI.py", filas_json])
