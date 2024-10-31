@@ -1,45 +1,39 @@
 from segmento import *
-import math
 import numpy as np
 import pandas as pd
+import math
 
 class ExpertSystem:
-    def __init__(self, kR_lineal:float, kR_angular:float, retrasoR:float,
-                    kT_lineal:float, kT_angular:float, retrasoT:float, 
-                    WMAX: float, hayTruco:bool) -> None:
+    def __init__(self, KR_lineal:float, KR_angular:float, KR_deteccion:float,
+                    KT_lineal:float, KT_angular:float, KT_deteccion:float) -> None:
 
         """
         Parámetros
         ----------
 
-        kR_lineal: constante que determina la velocidad lineal en una recta
-        kR_angular: constante que determina la velocidad angular en una recta
-        retrasoR: determina a partir de que momento el robot detecta un objetivo como alcanzado en una recta
+        KR_lineal: constante que determina la velocidad lineal en una recta
+        KR_angular: constante que determina la velocidad angular en una recta
+        KR_deteccion: determina a partir de que momento el robot detecta un objetivo como alcanzado en una recta
 
-        kT_lineal: constante que determina la velocidad lineal en un triángulo
-        kT_angular: constante que determina la velocidad angular en un triángulo
-        retrasoT: determina a partir de que momento el robot detecta un objetivo como alcanzado en un triángulo
+        KT_lineal: constante que determina la velocidad lineal en un triángulo
+        KT_angular: constante que determina la velocidad angular en un triángulo
+        KT_deteccion: determina a partir de que momento el robot detecta un objetivo como alcanzado en un triángulo
 
-        WMAX: establece la velocida angular máxima dentro del rango [-3, 3]
-        hayTruco: determina si el robot recorrerá el triángulo por la zona inferior
         """
         
         self.segmentoObjetivo = None    # Inicializamos valores en P1Launcher
         self.objetivoAlcanzado = False  # Final del segmento
         self.inicioAlcanzado = False    # Inicio del segmento (Punto cercano: Recta, PuntoMedio: Triángulo)
 
-        self.tipoSegmento = "triangulo" # Como se inicializa el segmento 0
+        self.tipoSegmento = "recta" # Como se inicializa el segmento 0
 
-        self.kR_lineal = kR_lineal      
-        self.kR_angular = kR_angular
-        self.retrasoR = retrasoR
+        self.KR_lineal = KR_lineal      
+        self.KR_angular = KR_angular
+        self.KR_deteccion = KR_deteccion
 
-        self.kT_lineal = kT_lineal
-        self.kT_angular = kT_angular
-        self.retrasoT = retrasoT
-
-        self.WMAX = WMAX
-        self.hayTruco = hayTruco
+        self.KT_lineal = KT_lineal
+        self.KT_angular = KT_angular
+        self.KT_deteccion = KT_deteccion
 
     def setObjetivo(self, segmento: object) -> None:
         """
@@ -51,6 +45,8 @@ class ExpertSystem:
 
         self.tipoSegmento: str = "recta" if self.segmentoObjetivo.getType() == 1 else "triangulo"
 
+
+
     def tomarDecision(self, poseRobot:tuple) -> tuple:
         """
         Determina que velocidad lineal y angular tiene el robot en el instante de 
@@ -61,101 +57,199 @@ class ExpertSystem:
 
         Devuelve una tupla con la velocidad lineal y velocidad angular.
         """
-
-        # Valores de información sobre el robot
-        xR, yR, angR, vR, wR = poseRobot
-        
-        # Determinamos el tipo de Retraso en función del tipo de segmento objetivo
-        tipoRetraso = self.retrasoR if self.tipoSegmento == "recta" or self.hayTruco else self.retrasoT
-        # En función de la velocidad que lleve el Robot el retraso será mayor o menor. 
-        retraso = tipoRetraso * vR
-    
-        if self.inicioAlcanzado:
-            # El final siempre será el mismo indep. de si es Triángulo o Recta 
-            xObj, yObj = self.segmentoObjetivo.getFin()
-            # Cálculo de distancia -> sqrt((x1-x2)**2 + (y1-y2)**2)
-            distancia_final = math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)
-            
-            # x = -vi**2 + v**2 / 2*aceleracion -> donde v = 0 (acabará frenado)
-            # Como la aceleración es negativa porque estamos frenando, cambiamos signos en denominador y numerador
-            
-            # El retraso servirá como constante que ajusta la distancia de detección en función de la velocidad
-            # Es por ello que lo restamos en el numerador
-            if distancia_final < abs(vR**2 - retraso)/2: 
-                self.objetivoAlcanzado = True
-
+        if self.tipoSegmento == "recta":
+            return self.decisionRecta(poseRobot)
         else:
-            # El punto inicial se determina en función del tipo de segmento objetivo
-            xObj, yObj = self.punto_cercano(poseRobot) if self.tipoSegmento == "recta" or self.hayTruco else self.segmentoObjetivo.getMedio() 
-            distancia_inicio = math.sqrt((xR - xObj) ** 2 + (yR - yObj) ** 2)
+            return self.decisionTriangulo(poseRobot)
+        
 
-            if distancia_inicio < (vR**2 - retraso)/2:  
-                self.inicioAlcanzado = True  
 
-        # Calcular el ángulo hacia el punto objetivo (punto más cercano o punto final)
+    def calcularerrorAngular(self, poseRobot:tuple, objetivo:tuple) -> float:
+        xR, yR, angR, vR, wR = poseRobot
+        xObj, yObj = objetivo
+
+        # Calcular el ángulo hacia el punto objetivo
         # tg(ang) = Copuesto / Ccontiguo = y/x
         angulo_objetivo = math.degrees(math.atan2(yObj - yR, xObj - xR))
+
         # Lo mantenemos en el rango [0, 360)
         angulo_robot = angR % 360 
 
         # Ángulo entre el Objetivo y el Robot
         error_angular = angulo_objetivo - angulo_robot
-
-        # Si tiene que dar más de media vuelta a la derecha
-        # Hacemos que vaya a la izquierda restando -360 (más corto)
         if error_angular > 180:
             error_angular -= 360
         # Si tiene que dar más de media vuelta a la izquierda
         # Hacemos que vaya a la derecha sumando +360 (más corto)
         elif error_angular < -180:
             error_angular += 360
+        
+        return error_angular
 
-        k_angular = self.kR_angular if self.tipoSegmento == "recta" or self.hayTruco else self.kT_angular
-        # La velocidad angular depende del error_angular (a mayor error, mayor velocidad)
-        # Depende también de la constante introducida como parámetro
-        w_angular = k_angular * error_angular
-        # Para evitar giros bruscos establecemos una WMAX dentro del rango [-3, 3]
-        w_angular = max(-self.WMAX, min(self.WMAX, w_angular))  
 
-        k_lineal = self.kR_lineal  if self.tipoSegmento == "recta" or self.hayTruco else self.kT_lineal
+    def decisionRecta(self, poseRobot:tuple) -> tuple:
+
+    #### VARIABLES DEL MÉTODO
+
+        # Información sobre el Robot
+        xR, yR, angR, vR, wR = poseRobot
+
+        # Primer Objetivo: Punto más cercano recta AB respecto al robot R
+        # Siguientes Objetivos: Punto medio situado en AB entre el punto final B y el robot R
+        objetivo = self.puntoCercano(poseRobot) if not self.inicioAlcanzado else self.puntoInterpolado(poseRobot, t=1/10)
+
+        # Diferencia de angulos entre el angObjetivo y el angRobot
+        error_angular = self.calcularerrorAngular(poseRobot, objetivo)
+
+        
+    #### DETECCIÓN OBJETIVO INICIAL (PUNTO CERCANO)
+        distanciaObjetivo = math.sqrt(abs((xR - objetivo[0]) ** 2 + (yR - objetivo[1]) ** 2))
+
+        # No es necesario utilizar 0.5 como distancia de detección
+        if not self.inicioAlcanzado and distanciaObjetivo <= (vR**2 - self.KR_deteccion)/2:
+            self.inicioAlcanzado = True 
+
+    #### DETECCIÓN OBJETIVO FINAL
+        xFinal, yFinal = self.segmentoObjetivo.getFin()
+        distanciaFinal = math.sqrt((xR - xFinal) ** 2 + (yR - yFinal) ** 2)
+
+        if distanciaFinal <= 0.5:
+            self.setobjetivoAlcanzado()
+
+        #self.debug("PC", distanciaObjetivo, objetivo)
+
+    #### V_LINEAL
+
+        try:
+            # función de tipo: k / sqrt(x) (la inversa de la raíz cuadrada donde el numerador es una constante)
+            # Determina la v_lineal que deberá llevar el Robot
+            variable_ANGULAR = self.KR_lineal/math.sqrt(abs(error_angular)) # Rango: [aprox(0.75 -> k=10), inf]
+        except (ZeroDivisionError, ValueError):
+            variable_ANGULAR = 3
+
+        v_lineal = variable_ANGULAR 
+
+
+    #### W_ANGULAR
+
+        # Usamos la función sqrt(x) * KR_angular
+        # Donde la constante aumenta el crecimiento de la funcón raíz cuadrada
+        # Se recomienda un valor menor a 1 para entrar en el rango de [0, 3]
+        try:
+            w_angular =  math.sqrt(error_angular) * self.KR_angular if error_angular >= 0 else -math.sqrt(-error_angular) * self.KR_angular 
+
+        except (ZeroDivisionError, ValueError):
+            w_angular = 0
+  
+        return v_lineal, w_angular
+
+
+    def decisionTriangulo(self, poseRobot:tuple) -> tuple:
+
+    #### VARIABLES DEL MÉTODO
+
+        # Información sobre el Robot
+        xR, yR, angR, vR, wR = poseRobot
+
+        # Primer Objetivo: Punto Medio del triángulo
+        # Segundo Objetivo: Fin del tríangulo
+        objetivo = self.segmentoObjetivo.getMedio() if not self.inicioAlcanzado else self.segmentoObjetivo.getFin()
+        
+        # Diferencia de angulos entre el angObjetivo y el angRobot
+        error_angular = self.calcularerrorAngular(poseRobot, objetivo)
+        
+
+    #### DETECCIÓN OBJETIVO INICIAL (PUNTO CERCANO)
+        if not self.inicioAlcanzado:
+
+            distanciaObjetivo = math.sqrt((xR - objetivo[0]) ** 2 + (yR - objetivo[1]) ** 2)
+
+            # x = -vi**2 + v**2 / 2*aceleracion -> donde v = 0 (acabará frenado)
+            # El retraso servirá como constante que ajusta la distancia de detección en función de la velocidad
+            # Es por ello que lo restamos en el numerador
+
+            #¡En un futuro podremos quitar el *vR de KT_Freando!
+            if distanciaObjetivo < abs(vR**2 - self.KT_deteccion*vR)/2: 
+                self.inicioAlcanzado = True
+
+    #### DETECCIÓN OBJETIVO FINAL
+        xFinal, yFinal = self.segmentoObjetivo.getFin()
+        distanciaFinal = math.sqrt((xR - xFinal) ** 2 + (yR - yFinal) ** 2)
+
+        if distanciaFinal <= 0.5:
+            self.setobjetivoAlcanzado()
+
+    #### V_LINEAL
+
+
         # La CTE_ANGULAR depende del error_angular (a mayor error, menor valor = menor velocidad)
         # Cuando el error es máximo la cte reduce a la mitad (1/2), cuando es menor tiende a infinito (máximo 3)
-        CTE_ANGULAR = 1/abs(error_angular/90)   # He preferido dejarlo fijo y no como parámetro en el __init__
-        v_lineal = CTE_ANGULAR * k_lineal       # Porque ya tenemos k_lineal como parámetro
-        # No queremos velocidades lineales negativas 
-        v_lineal = max(0, v_lineal) 
+        CTE_ANGULAR = 1/abs(error_angular/90)       # He preferido dejarlo fijo y no como parámetro en el __init__
+                                                    # Porque ya tenemos k_lineal como parámetro
+        v_lineal = CTE_ANGULAR * self.KT_lineal
+ 
 
-        return (v_lineal, w_angular)
+    #### W_ANGULAR
+ 
+        # La velocidad angular depende del error_angular (a mayor error, mayor velocidad angular)
+        # Nuestra constante servirá para regular este valor
+        w_angular = self.KT_angular * error_angular
 
-    def esObjetivoAlcanzado(self):
-        return self.objetivoAlcanzado
 
-    def punto_cercano(self, poseRobot):
-        # Coordenadas del robot
+
+        return v_lineal, w_angular
+
+#################################### objetivos ####################################
+
+    def puntoCercano(self, poseRobot: tuple):
         xR, yR = poseRobot[0], poseRobot[1]
-
-        # Obtener los puntos inicial y final del segmento objetivo
         xA, yA = self.segmentoObjetivo.getInicio()
         xB, yB = self.segmentoObjetivo.getFin()
 
-        # Vector del segmento (B - A)
-        AB = np.array([xB - xA, yB - yA])
-        AR = np.array([xR - xA, yR - yA])
+        # Vectores (AB y AR)
+        ABx, ABy = xB - xA, yB - yA
+        ARx, ARy = xR - xA, yR - yA
 
-        # Proyección de AP sobre AB
-        t = np.dot(AR, AB) / np.dot(AB, AB)
+        # Proyección de AR sobre AB 
+        # AR * AB / |AB|**2
+        AB_escalar = ABx**2 + ABy**2
 
-        # Limitar t al rango [0, 1] para asegurar que el punto proyectado esté dentro del segmento
-        t = max(0, min(1, t))
+        try:
+            proyeccion = max(0, min(1, (ARx * ABx + ARy * ABy) / AB_escalar))
+        except (ZeroDivisionError, ValueError):
+            proyeccion = 0
 
         # Calcular el punto más cercano en la línea
-        punto_cercano = np.array([xA, yA]) + t * AB
+        punto_cercano_x = xA + proyeccion * ABx
+        punto_cercano_y = yA + proyeccion * ABy
 
-        return (punto_cercano[0], punto_cercano[1])
+        return (punto_cercano_x, punto_cercano_y)
+        
 
-    def hayParteOptativa(self):
+    def puntoInterpolado(self, poseRobot: tuple, t: float):
+        
+        punto_cercano = self.puntoCercano(poseRobot)
+        xB, yB = self.segmentoObjetivo.getFin()
+
+        x_t = (1 - t) * punto_cercano[0] + t * xB
+        y_t = (1 - t) * punto_cercano[1] + t * yB
+
+        return (x_t, y_t)
+
+
+
+#################################### set ####################################
+    def setobjetivoAlcanzado(self) -> None:
+        self.objetivoAlcanzado = True  
+
+#################################### P1Launcher ####################################
+    def hayParteOptativa(self) -> bool:
         return True
     
+    def esObjetivoAlcanzado(self) -> bool:
+        return self.objetivoAlcanzado
+    
+#################################### csv ####################################
     def añadirFila(self,nueva_fila: dict, nombre: str) -> None:
             df = pd.read_csv(nombre, index_col=0)
             df.loc[len(df)] = nueva_fila
@@ -169,8 +263,6 @@ class ExpertSystem:
         else:
             return (max(df.index))
     
-    def objetivoAlcanzadoTrue(self):
-        self.objetivoAlcanzado = True
-
- 
-            
+##################################### debug ####################################
+    def debug(self, objetivo:str, distancia:int, coordenadas:tuple) -> None:
+        print(f"{objetivo} -> Distancia: {distancia:.2f} | Coordenadas: {coordenadas}")

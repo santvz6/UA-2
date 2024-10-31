@@ -1,1 +1,0 @@
-"Todavía no sé"

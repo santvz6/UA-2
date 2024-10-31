@@ -1,23 +1,25 @@
 import subprocess
 import pandas as pd
 import numpy as np
+import sys
 
 # Ruta completa del intérprete de Python dentro del entorno virtual
-python_path = "/home/sant_vz6/Escritorio/UA-2/Razonamiento/.venv/bin/python"
+python_path = ".venv/bin/python3.12"
 
 ################################ PARAMETROS ###############################################
-NUM_P = 3
+NUM_P = 1
 
-kR_lineal = np.linspace(0.700, 0.800, NUM_P) # [0.700, 0.750, 0.800] 
-kR_angular = np.linspace(0.055, 0.065, NUM_P)  # [0.055, 0.060, 0.065]
-retrasoR =  np.linspace(1.45, 1.55, NUM_P) # [1.45, 1.50, 1.55]
+KR_lineal = np.linspace(0.65, 1, 8)  # 0.65
+KR_angular = np.linspace(0.045, 0.065, 5) #0.07
+KR_deteccion = np.linspace(2.25, 3, NUM_P) #1.45
 
-kT_lineal = np.linspace(0.950, 1.050, NUM_P) # [0.950, 1.000, 1.050]
-kT_angular = np.linspace(0.015, 0.025, NUM_P) # [0.015, 0.020, 0.025]
-retrasoT = np.linspace(0.90, 1.10, NUM_P) # [0.90, 1.00, 1.10]
+KT_lineal = np.linspace(1, 1.1, NUM_P)        #1.1
+KT_angular = np.linspace(0.02, 0.020, NUM_P)    #0.02
+KT_deteccion = np.linspace(0.9, 1.1, NUM_P)     # 0.9
 
-wM = 2.00 # np.linspace(1.90, 2.10, 5)
-hayTruco:bool = False
+
+# el TRUCO está en meter un KT_frenado que solo afecte al punto final del triangulo 
+
 
 ################################ CREACIÓN ARCHIVO CSV ###############################################
 
@@ -30,32 +32,31 @@ def existeFila(nombre:str, fila: list) -> bool:
     try:
         df = pd.read_csv(nombre, index_col=0)
     except:
-        df = pd.DataFrame(columns=["puntuacion", "Truco", "kRe_V", "kRe_W", "Ret-", "segm1", "segm3", "segm5",
-                                        "kTr_V", "kTr_W", "RetΔ", "segm2", "segm4", "segm6", "WMAX"])
+        df = pd.DataFrame(columns=["puntuacion", "KR_Vl", "KR_Wa", "Dtc-", "segm1", "segm3", "segm5",
+                                                    "KT_Vl", "KT_Wa", "DtcΔ", "segm2", "segm4", "segm6"])
         df.index.name = "ID" 
         df.to_csv(nombre, index=True)  
     else:
         for _, row in df.iterrows():
-            if [row["kRe_V"], row["kRe_W"], row["Ret-"], row["kTr_V"], row["kTr_W"], row["RetΔ"], row["WMAX"]] == fila:
+            if [row["KR_Vl"], row["KR_Wa"], row["Dtc-"], row["KT_Vl"], row["KT_Wa"], row["DtcΔ"]] == fila:
                 return True
         return False
-         
+
 
 ################################ MAIN ###############################################
-for kRl in kR_lineal:
-    for kRa in kR_angular:
-        for retR in retrasoR:
-            for kTl in kT_lineal:
-                for kTa in kT_angular:
-                    for retT in retrasoT:
-                        fila = [kRl, kRa, retR, kTl, kTa, retT, wM]
+for KRv in KR_lineal:
+    for KRw in KR_angular:
+        for dtcR in KR_deteccion:
+            for KTv in KT_lineal:
+                for KTw in KT_angular:
+                    for dtcT in KT_deteccion:
+                        fila = [KRv, KRw, dtcR, KTv, KTw, dtcT]
+                        
                         if not existeFila("datos.csv", fila):
                             # Ejecuta el archivo .py que deseas ejecutar en bucle con parámetros
-                            result = subprocess.run([
-                                python_path, "P1Launcher.py",
-                                str(kRl), str(kRa), str(retR),
-                                str(kTl), str(kTa), str(retT),
-                                str(wM), str(hayTruco)
+                            result = subprocess.run([python_path, "P1Launcher.py",
+                                str(KRv), str(KRw), str(dtcR),
+                                str(KTv), str(KTw), str(dtcT)
                             ])
                         else:
                             print("Ya se ha ejecutado anteriormente:", fila)

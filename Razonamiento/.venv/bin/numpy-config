@@ -1,4 +1,4 @@
-#!/home/sant_vz6/Escritorio/UA/Razonamiento/.venv/bin/python3
+#!/home/sant_vz6/Escritorio/UA-2/Razonamiento/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
