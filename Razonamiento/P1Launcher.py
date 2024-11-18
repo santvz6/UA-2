@@ -7,7 +7,7 @@
  ' V 0.5
 '''
 
-
+import math
 import pygame
 import time
 import numpy as np
@@ -26,6 +26,7 @@ RADIUS = 8 # Radio de dibujo para los puntos objetivo
 #Cambiar a True para usar el sistema experto difuso
 useFuzzySystem = False
 
+testeando:bool = False # True -> no ejecutará el dibujo del recorrido
 
 # pygame setup
 pygame.init()
@@ -173,6 +174,7 @@ triangulo.setFin((12, 34))
 triangulo.setMedio((8, 26))
 objectiveSet.append(triangulo)
 
+
 numPath = 0
 
 #####################################################################################
@@ -186,8 +188,7 @@ KT_deteccion = float(sys.argv[6])
 
 
 if useFuzzySystem:
-    experto = ExpertSystem(KR_lineal, KR_angular, KR_deteccion,
-                            KT_lineal, KT_angular, KT_deteccion)
+    experto = FuzzySystem()
 else:
     experto = ExpertSystem(KR_lineal, KR_angular, KR_deteccion,
                             KT_lineal, KT_angular, KT_deteccion)
@@ -243,7 +244,6 @@ while running:
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("gray10")
-
 
 
     # RENDER YOUR GAME HERE
@@ -345,7 +345,8 @@ dict_datos["puntuacion"] = totalScore
 print(f'Puntuación total: {totalScore}')
 
 
-
+if testeando:
+    sys.exit()
 
 
 trajCont = 1

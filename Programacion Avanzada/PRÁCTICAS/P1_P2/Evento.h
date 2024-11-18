@@ -1,6 +1,3 @@
-#include <string>
-using namespace std;
-
 #include "Fecha.h"
 
 class Evento{

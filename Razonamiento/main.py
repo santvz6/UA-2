@@ -9,11 +9,11 @@ python_path = ".venv/bin/python3.12"
 ################################ PARAMETROS ###############################################
 NUM_P = 1
 
-KR_lineal = np.linspace(0.65, 1, 8)  # 0.65
-KR_angular = np.linspace(0.045, 0.065, 5) #0.07
-KR_deteccion = np.linspace(2.25, 3, NUM_P) #1.45
+KR_lineal = np.linspace(5, 10, 6)  # 0.65
+KR_angular = np.linspace(0.07, 0.065, NUM_P) #0.07
+KR_deteccion = np.linspace(2.42, 3, NUM_P) #1.45
 
-KT_lineal = np.linspace(1, 1.1, NUM_P)        #1.1
+KT_lineal = np.linspace(10.4, 10.4, NUM_P)        #1.1
 KT_angular = np.linspace(0.02, 0.020, NUM_P)    #0.02
 KT_deteccion = np.linspace(0.9, 1.1, NUM_P)     # 0.9
 
@@ -43,6 +43,8 @@ def existeFila(nombre:str, fila: list) -> bool:
         return False
 
 
+mapa = "prueba"
+
 ################################ MAIN ###############################################
 for KRv in KR_lineal:
     for KRw in KR_angular:
@@ -53,11 +55,22 @@ for KRv in KR_lineal:
                         fila = [KRv, KRw, dtcR, KTv, KTw, dtcT]
                         
                         if not existeFila("datos.csv", fila):
-                            # Ejecuta el archivo .py que deseas ejecutar en bucle con parámetros
-                            result = subprocess.run([python_path, "P1Launcher.py",
-                                str(KRv), str(KRw), str(dtcR),
-                                str(KTv), str(KTw), str(dtcT)
-                            ])
+                            if mapa == "f1":
+                                result = subprocess.run([python_path, "Austria.py",
+                                    str(KRv), str(KRw), str(dtcR),
+                                    str(KTv), str(KTw), str(dtcT)
+                                ])
+
+                            else:
+                                # Ejecuta el archivo .py que deseas ejecutar en bucle con parámetros
+                                result = subprocess.run([python_path, "P1Launcher.py",
+                                    str(KRv), str(KRw), str(dtcR),
+                                    str(KTv), str(KTw), str(dtcT)
+                                ])
                         else:
                             print("Ya se ha ejecutado anteriormente:", fila)
+                            """result = subprocess.run([python_path, "P1Launcher.py",
+                                str(KRv), str(KRw), str(dtcR),
+                                str(KTv), str(KTw), str(dtcT)
+                            ])"""
                             continue

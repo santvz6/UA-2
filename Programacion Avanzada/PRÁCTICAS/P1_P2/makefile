@@ -1,22 +1,21 @@
+
 COMP=g++
-OPT=-Wall -std=c++11
+OPT=-Wall -g -std=c++11
 
-# Archivo ejecutable final
-ejemplo: ejemplo.o Calendario.o Evento.o
-	$(COMP) $(OPT) -o ejemplo ejemplo.o Calendario.o Evento.o
+main: Ejemplo.o Fecha.o Evento.o Calendario.o
+	$(COMP) $(OPT) -o main Ejemplo.o Fecha.o Evento.o Calendario.o
 
-# Compilación de Ejemplo.cc
-ejemplo.o: Ejemplo.cc Calendario.h Evento.h
-	$(COMP) $(OPT) -c Ejemplo.cc
+Ejemplo.o: Ejemplo.cc Fecha.h Evento.h Calendario.h
+	$(COMP) $(OPT) -c  Ejemplo.cc
 
-# Compilación de Calendario.cc
-Calendario.o: Calendario.cc Calendario.h Evento.h
+Fecha.o: Fecha.cc Fecha.h
+	$(COMP) $(OPT) -c Fecha.cc
+
+Evento.o: Evento.cc Evento.h Fecha.h
+	$(COMP) $(OPT) -c Evento.cc
+	
+Calendario.o: Calendario.cc Calendario.h Fecha.h Evento.h
 	$(COMP) $(OPT) -c Calendario.cc
 
-# Compilación de Evento.cc
-Evento.o: Evento.cc Evento.h
-	$(COMP) $(OPT) -c Evento.cc
-
-# Limpieza de archivos intermedios
 clean:
-	rm -f *.o ejemplo
+	rm *.o main

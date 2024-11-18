@@ -1,34 +1,6 @@
-// Fichero para implementar la funcionalidad 
-// de los métodos que incluye la clase
-
-#include "Fecha.h" // Importamos el fichero Fecha.h
-#include <iostream>
-using namespace std;
-
-
-string Fecha::aCadena(bool larga, bool conDia) {
-    string cadena;
-    string dias_semana[] = {"lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"};
-    string meses[] = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
-                    "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-
-    if (larga) {
-        cadena = to_string(dia) + " de " + meses[mes-1] + " de " + to_string(año);
-        if (conDia) {
-            cadena = dias_semana[getDiaSemana()] + " " + cadena;
-        }
-    } 
-    else {
-        cadena = to_string(dia) + "/" + to_string(mes) + "/" + to_string(año);
-        if (conDia){
-            cadena = dias_semana[getDiaSemana()] + " " + cadena;
-        } 
-    }
-    return cadena;
-}
+#include "Fecha.h" 
 
 Fecha::Fecha(){
-    cout<<"Ejecutando Constructor"<<endl;
     dia = 1;
     mes = 1;
     año = 1900;
@@ -49,7 +21,6 @@ Fecha::Fecha(int diai,int mesi,int añoi){
 }
 
 Fecha::~Fecha(){
-    cout<<"Ejecutando Destructor"<<endl;
     dia = 1;
     mes = 1;
     año = 1900;
@@ -92,17 +63,17 @@ bool Fecha::operator!=(const Fecha &obj) const{
     return false;
 }
 
-bool Fecha::operator<(const Fecha &obj) const{
+bool Fecha::operator<(const Fecha& obj) const {
     if (año < obj.año) return true;
-    else if (mes < obj.mes) return true;
-    else if (dia < obj.dia) return true;
+    if (año == obj.año && mes < obj.mes) return true;
+    if (año == obj.año && mes == obj.mes && dia < obj.dia) return true;
     return false;
 }
 
-bool Fecha::operator<(const Fecha &obj) const{
+bool Fecha::operator>(const Fecha& obj) const {
     if (año > obj.año) return true;
-    else if (mes > obj.mes) return true;
-    else if (dia > obj.dia) return true;
+    if (año == obj.año && mes > obj.mes) return true;
+    if (año == obj.año && mes == obj.mes && dia > obj.dia) return true;
     return false;
 }
 
@@ -154,7 +125,6 @@ bool Fecha::incrementaAnyos(int inc){
     return resetAtributos(diai, mesi, añoi);
 }
     
-
 bool Fecha::incrementaMeses(int inc){
     int diai = dia;
     int mesi = mes;
@@ -192,7 +162,6 @@ bool Fecha::incrementaMeses(int inc){
     else
         return resetAtributos(diai, mesi, añoi);
 }
-
 
 bool Fecha::incrementaDias(int inc){
     int diai = dia;
@@ -346,4 +315,25 @@ int Fecha::getDiaSemana(){
             return dias_transc%7;
         }
     }
+}
+
+string Fecha::aCadena(bool larga, bool conDia) {
+    string cadena;
+    string dias_semana[] = {"lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"};
+    string meses[] = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+                    "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
+
+    if (larga) {
+        cadena = to_string(dia) + " de " + meses[mes-1] + " de " + to_string(año);
+        if (conDia) {
+            cadena = dias_semana[getDiaSemana()] + " " + cadena;
+        }
+    } 
+    else {
+        cadena = to_string(dia) + "/" + to_string(mes) + "/" + to_string(año);
+        if (conDia){
+            cadena = dias_semana[getDiaSemana()] + " " + cadena;
+        } 
+    }
+    return cadena;
 }

@@ -36,3 +36,8 @@ array = np.array([[0, 0, 0, 0],
 
 res = plantar(array)
 print(res)
+
+def backtracking(mem, arr):
+    
+    i, j = np.shape(arr)
+    

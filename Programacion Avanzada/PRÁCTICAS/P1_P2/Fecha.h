@@ -1,6 +1,4 @@
-// Fichero dedicado a la creación de la clase
-// y de todos sus métodos (tiene formato .h)
-
+#include <iostream>
 #include <string>
 using namespace std;
 

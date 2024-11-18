@@ -1,11 +1,9 @@
 #include "Evento.h"
-#include <iostream>
-using namespace std;
 
 // Constructor por defecto
 Evento::Evento() {
     f = Fecha(1, 1, 1900);
-    descripcion = "sin descripcion";
+    descripcion = "sin descripción";
 }
 
 // Constructor sobrecargado: inicializa la fecha según los parám    etros
@@ -52,7 +50,7 @@ bool Evento::operator>(const Evento &obj) const{
 // Destructor
 Evento::~Evento() {
     f = Fecha(1, 1, 1900); 
-    descripcion = "sin descripcion";
+    descripcion = "sin descripción";
 }
 
 // Devuelve (una copia de) la fecha
@@ -78,6 +76,6 @@ bool Evento::setDescripcion(const string& nuevaDesc) {
         descripcion = nuevaDesc;
         return true;
     }
-    descripcion = "sin descripcion";
+    descripcion = "sin descripción";
     return false;
 }

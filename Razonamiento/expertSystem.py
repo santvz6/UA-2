@@ -96,7 +96,7 @@ class ExpertSystem:
 
         # Primer Objetivo: Punto más cercano recta AB respecto al robot R
         # Siguientes Objetivos: Punto medio situado en AB entre el punto final B y el robot R
-        objetivo = self.puntoCercano(poseRobot) if not self.inicioAlcanzado else self.puntoInterpolado(poseRobot, t=1/10)
+        objetivo = self.puntoCercano(poseRobot) if not self.inicioAlcanzado else self.puntoInterpolado(poseRobot, t=1/9)
 
         # Diferencia de angulos entre el angObjetivo y el angRobot
         error_angular = self.calcularerrorAngular(poseRobot, objetivo)
