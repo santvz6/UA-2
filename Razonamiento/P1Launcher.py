@@ -7,7 +7,7 @@
  ' V 0.5
 '''
 
-import math
+
 import pygame
 import time
 import numpy as np
@@ -15,18 +15,13 @@ from robot import *
 from segmento import *
 from expertSystem import *
 from fuzzyExpert import *
-import sys
-
 AppTitle = "RRDC P1 2024"
-
-
 
 RADIUS = 8 # Radio de dibujo para los puntos objetivo
 
 #Cambiar a True para usar el sistema experto difuso
-useFuzzySystem = False
+useFuzzySystem = True
 
-testeando:bool = False # True -> no ejecutará el dibujo del recorrido
 
 # pygame setup
 pygame.init()
@@ -36,8 +31,7 @@ clock = pygame.time.Clock()
 running = True
 programQuit = False
 
-robotIimage = pygame.image.load('robot1.png').convert_alpha()
-
+robotIimage = pygame.image.load('robot1.png').convert_alpha();
 
 ################################################################################################
 def mostrar_texto(texto, pos_x, pos_y, tamaño=20, color=(255, 255, 255)):
@@ -45,7 +39,10 @@ def mostrar_texto(texto, pos_x, pos_y, tamaño=20, color=(255, 255, 255)):
     fuente = pygame.font.Font(None, tamaño)
     txt_surface = fuente.render(texto, True, color)  
     screen.blit(txt_surface, (pos_x, pos_y)) 
+
+puntuacionSegmento = (0,0,0)
 ################################################################################################
+
 
 def drawRobot(pose):
     #from Aleksandar haber
@@ -133,8 +130,6 @@ def getTriangleScore(triangulo, posiciones, tiempo=1):
     for pos in posiciones:
         if inTriangle(triangulo, pos[0:2]):
             penalizacion += 1
-            #print("Triangulo")
-
         m1 = medio[0]-pos[0]
         m2 = medio[1]-pos[1]
         norm = math.sqrt(m1*m1+m2*m2)
@@ -174,29 +169,14 @@ triangulo.setFin((12, 34))
 triangulo.setMedio((8, 26))
 objectiveSet.append(triangulo)
 
-
 numPath = 0
-
-#####################################################################################
-KR_lineal = float(sys.argv[1])
-KR_angular = float(sys.argv[2])
-KR_deteccion = float(sys.argv[3])
-
-KT_lineal = float(sys.argv[4])
-KT_angular = float(sys.argv[5])
-KT_deteccion = float(sys.argv[6])
-
 
 if useFuzzySystem:
     experto = FuzzySystem()
 else:
-    experto = ExpertSystem(KR_lineal, KR_angular, KR_deteccion,
-                            KT_lineal, KT_angular, KT_deteccion)
-    
+    experto = ExpertSystem()
 experto.setObjetivo(objectiveSet[numPath])
 optativo = experto.hayParteOptativa()
-######################################################################################
-
 
 miRobot.setPose((1,10,-10))
 
@@ -210,29 +190,6 @@ totalScore = 0
 
 timePerFrame = []
 
-########################################################################################
-puntuacionSegmento = (0,0,0)
-
-dict_datos = {
-    "puntuacion": f"{totalScore:.7f}",  
-    
-    "KR_Vl": f"{KR_lineal:.3f}",       
-    "KR_Wa": f"{KR_angular:.3f}",
-    "Dtc-": f"{KR_deteccion:.2f}",          
-    "segm1": f"{0:.3f}",
-    "segm3": f"{0:.3f}",
-    "segm5": f"{0:.3f}",
-
-    "KT_Vl": f"{KT_lineal:.3f}",
-    "KT_Wa": f"{KT_angular:.3f}",
-    "DtcΔ": f"{KT_deteccion:.2f}",
-    "segm2": f"{0:.3f}",
-    "segm4": f"{0:.3f}",
-    "segm6": f"{0:.3f}"
-}
-########################################################################################
-
-
 while running:
 
     # poll for events
@@ -243,8 +200,7 @@ while running:
             programQuit = True
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("gray10")
-
+    screen.fill("blue")
 
     # RENDER YOUR GAME HERE
     for trajCont in range(len(objectiveSet)):
@@ -255,7 +211,11 @@ while running:
     trayectoria.append(poseActual)
     trayectoriaTotal.append(poseActual)
 
-################################################################################################
+    timeLapse = clock.tick(60)  
+    miRobot.updateDynamics(timeLapse)
+    timePerFrame.append(timeLapse)
+
+
     mostrar_texto(f"Segmento Actual: {numPath+1}", 10, 10)
     mostrar_texto(f"Puntuación Segmento {puntuacionSegmento[0]:.4f}", 10, 30, color=(0, 255, 0))
     mostrar_texto(f"Puntuación Total {totalScore}", 10, 50, color=(255, 0, 0))
@@ -268,45 +228,16 @@ while running:
     mostrar_texto(f"Tiempo Transcurrido: {(time.time() - tinicio):.2f}", 10, 170, color=(0,0,255))
 
 
-    mostrar_texto(f"KR_V: {dict_datos["KR_Vl"]}", 920, 420, color=(255, 255, 0))
-    mostrar_texto(f"KR_W: {dict_datos["KR_Wa"]}", 920, 440, color=(255, 255, 0))
-    mostrar_texto(f"Detc-: {dict_datos["Dtc-"]}", 920, 460, color=(255, 255, 0))
-    mostrar_texto(f"KT_V: {dict_datos["KT_Vl"]}", 920, 500, color=(255, 0, 255))
-    mostrar_texto(f"KT_W: {dict_datos["KT_Wa"]}", 920, 520, color=(255, 0, 255))
-    mostrar_texto(f"DtcΔ: {dict_datos["DtcΔ"]}", 920, 540, color=(255, 0, 255))
-
-
-    mostrar_texto(f"Puntuación Segm1: {dict_datos["segm1"]}", 840, 580, color=(255, 255, 0))
-    mostrar_texto(f"Puntuación Segm3: {dict_datos["segm3"]}", 840, 600, color=(255, 255, 0))
-    mostrar_texto(f"Puntuación Segm5: {dict_datos["segm5"]}", 840, 620, color=(255, 255, 0))
-    mostrar_texto(f"Puntuación Segm2: {dict_datos["segm2"]}", 840, 660, color=(255, 0, 255))
-    mostrar_texto(f"Puntuación Segm4: {dict_datos["segm4"]}", 840, 680, color=(255, 0, 255))
-    mostrar_texto(f"Puntuación Segm6: {dict_datos["segm6"]}", 840, 700, color=(255, 0, 255))
-    
-################################################################################################
-
-    timeLapse = clock.tick(60)  
-    miRobot.updateDynamics(timeLapse)
-    timePerFrame.append(timeLapse)
     if experto.esObjetivoAlcanzado():
         elapsedTime = time.time() - tinicio
         if numPath>=len(objectiveSet):
             miRobot.setVel((0,0))
             running = False
         else:
-            # Recta
             if objectiveSet[numPath].getType()==1:
                 segmentScore = getSegmentScore(objectiveSet[numPath], trayectoria, elapsedTime)
-            # Triángulo
             else:
                 segmentScore = getTriangleScore(objectiveSet[numPath], trayectoria, elapsedTime)
-            
-########################################################################################
-            if dict_datos["segm1"] != "None":
-                puntSegm = f"{segmentScore[0]:.3f}"
-                dict_datos["segm"+str(numPath+1)] = puntSegm
-########################################################################################
-         
             trayectoria.clear()
             totalScore += segmentScore[0]
             print(f'Puntuación del objetivo: {segmentScore[0]}. Puntuación de distancia: {segmentScore[1]} en {segmentScore[2]} segundos')
@@ -320,34 +251,11 @@ while running:
     else:
         velocidades = experto.tomarDecision(miRobot.getPose())
         miRobot.setVel(velocidades)
-    
-########################################################################################
-        
-        if objectiveSet[numPath].getType()==1:
-            puntuacionSegmento = getSegmentScore(objectiveSet[numPath], trayectoria, time.time()-tinicio)
-        else:
-            puntuacionSegmento = getTriangleScore(objectiveSet[numPath], trayectoria, time.time()-tinicio)
-
-
-        if time.time() - tinicio > 100: # 2 minutos
-            for i in range(6):
-                dict_datos["segm"+str(i+1)] = "None"
-            
-            numPath=len(objectiveSet)
-            experto.setobjetivoAlcanzado()
-            
-########################################################################################
-
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-dict_datos["puntuacion"] = totalScore
+
 print(f'Puntuación total: {totalScore}')
-
-
-if testeando:
-    sys.exit()
-
 
 trajCont = 1
 while not programQuit:
@@ -355,48 +263,13 @@ while not programQuit:
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-########################################################################################
-            # Creación/Edición del DataFrame
-            experto.añadirFila(nueva_fila=dict_datos, nombre="datos.csv")
-            # Creación Captura de Pantalla
-            pygame.image.save(screen, "Recorridos/ID"+ str(experto.getmaxID(nombre="datos.csv")) + ".png")    
-########################################################################################
 
+            pygame.image.save(screen, "Recorridos/ID"+ "foto" + ".png")
             programQuit = True
-
+            
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("grey15")
-
-################################################################################################
-    mostrar_texto(f"Segmento Actual: {numPath+1}", 10, 10)
-    mostrar_texto(f"Puntuación Segmento {puntuacionSegmento[0]:.4f}", 10, 30, color=(0, 255, 0))
-    mostrar_texto(f"Puntuación Total {totalScore}", 10, 50, color=(255, 0, 0))
-
-
-    mostrar_texto(f"Posicion: ({poseActual[0]:.4f}, {poseActual[1]:4f})", 10, 90)
-    mostrar_texto(f"Angulo: {poseActual[2]%360:.2f}", 10, 110)
-    mostrar_texto(f"VLineal: {poseActual[3]:.2f}", 10, 130)
-    mostrar_texto(f"WAngular: {poseActual[4]:.2f}", 10, 150)
-    mostrar_texto(f"Tiempo Transcurrido: {elapsedTime:.2f}", 10, 170, color=(0,0,255))
-
-    mostrar_texto(f"KR_V: {dict_datos["KR_Vl"]}", 920, 420, color=(255, 255, 0))
-    mostrar_texto(f"KR_W: {dict_datos["KR_Wa"]}", 920, 440, color=(255, 255, 0))
-    mostrar_texto(f"Detc-: {dict_datos["Dtc-"]}", 920, 460, color=(255, 255, 0))
-    mostrar_texto(f"KT_V: {dict_datos["KT_Vl"]}", 920, 500, color=(255, 0, 255))
-    mostrar_texto(f"KT_W: {dict_datos["KT_Wa"]}", 920, 520, color=(255, 0, 255))
-    mostrar_texto(f"DtcΔ: {dict_datos["DtcΔ"]}", 920, 540, color=(255, 0, 255))
-
-    mostrar_texto(f"Puntuación Segm1: {dict_datos["segm1"]}", 840, 580, color=(255, 255, 0))
-    mostrar_texto(f"Puntuación Segm3: {dict_datos["segm3"]}", 840, 600, color=(255, 255, 0))
-    mostrar_texto(f"Puntuación Segm5: {dict_datos["segm5"]}", 840, 620, color=(255, 255, 0))
-    mostrar_texto(f"Puntuación Segm2: {dict_datos["segm2"]}", 840, 660, color=(255, 0, 255))
-    mostrar_texto(f"Puntuación Segm4: {dict_datos["segm4"]}", 840, 680, color=(255, 0, 255))
-    mostrar_texto(f"Puntuación Segm6: {dict_datos["segm6"]}", 840, 700, color=(255, 0, 255))
-    
-################################################################################################
-
-    
+    screen.fill("blue")
     for cont in range(len(objectiveSet)):
         path = objectiveSet[cont]
         drawObjective(path, False)
@@ -414,12 +287,8 @@ while not programQuit:
             p1 = (trayectoriaTotal[cont-1][0]*10, sizeY-trayectoriaTotal[cont-1][1]*10)
             p2 = (trayectoriaTotal[cont][0]*10, sizeY-trayectoriaTotal[cont][1]*10)
             pygame.draw.line(screen, "red", p1, p2, 2)
-
-        ########################################################################################   
-        pygame.event.post(pygame.event.Event(pygame.QUIT))
-        ########################################################################################
-
     pygame.display.flip()
+
     timeLapse = clock.tick(60)  
     miRobot.updateDynamics(timeLapse)
 
