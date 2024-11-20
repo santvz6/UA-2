@@ -27,7 +27,7 @@ class ExpertSystem:
         self.KR_angular = 0.07
         self.KR_deteccion = 2.42
 
-        self.KT_lineal = 10.4
+        self.KT_lineal = 0.02
         self.KT_angular = 0.02
         self.KT_deteccion = 0.9
 
@@ -169,18 +169,10 @@ class ExpertSystem:
             self.setobjetivoAlcanzado()
 
     #### V_LINEAL
-
-        # Función matemática utilizada anteriormente: 1/(x=error_angular/90) * KR_angular
-        # Donde la constante aumenta el valor de la Y respecto de X
-        v_lineal = 3
+        v_lineal = 3 - ((error_angular-120) * self.KT_lineal)
  
 
     #### W_ANGULAR
-
-        # Función matemática utilizada anteriormente: 1/(x=error_angular/90) * KR_angular
-        # Donde la constante aumenta el valor de la Y respecto de X
-        # A mayor error, mayor velocidad angular
-        # Se recomienda una constante con valor 0.9, si el error es mayor a 3.33 maximizamos la w_angular
         w_angular = self.KT_angular * error_angular
 
         return v_lineal, w_angular

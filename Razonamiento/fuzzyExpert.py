@@ -16,7 +16,7 @@ class FuzzySystem:
         self.tipoSegmento: str = "recta" # Comenzamos como una recta siempre
 
         self.KR_deteccion = 2
-        self.KT_deteccion = 2
+        self.KT_deteccion = 1
 
         self.poseRobot = ("xRob", "yRob", "angRob", "vR", "wR")
 
@@ -40,8 +40,8 @@ class FuzzySystem:
             "v_lineal": FuzzyVariable(
                 universe_range=(0, 3),
                 terms={
-                    "rapido": [(2, 0), (2.5, 0.33), (2.9, 0.66), (3, 1)],
-                    "medio":  [(1, 1), (1.5, 0.66), (1.75, 0.33), (2, 0)],
+                    "rapido": [(2, 0), (2.5, 0.66), (3, 1), (4, 1)],
+                    "medio":  [(1, 1), (1.5, 0.66), (1.75, 0.4), (2, 0)],
                     "lento":  [(0, 1), (0.1, 0.66), (0.5, 0.33), (0.8, 0)],
                     
                 },
@@ -51,7 +51,7 @@ class FuzzySystem:
                 terms={
                     "rapido": [(1.2, 0), (1.4, 0.33), (1.8, 0.66), (2.2, 1)],
                     "medio": [(1.4, 1), (1, 0.66), (0.6, 0.33), (0.4, 0)],
-                    "lento": [(0, 1), (0.05, 0.66), (0.1, 0.33), (0.15, 0)],
+                    "lento": [(0, 1), (0.02, 0.66), (0.05, 0.33), (0.1, 0)],
                     
                 },
             ),

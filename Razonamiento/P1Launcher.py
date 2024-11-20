@@ -264,7 +264,7 @@ while not programQuit:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
 
-            pygame.image.save(screen, "Recorridos/ID"+ "foto" + ".png")
+            pygame.image.save(screen, "Recorridos/ID"+ "3" + ".png")
             programQuit = True
             
 
