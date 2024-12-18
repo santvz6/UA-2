@@ -1,0 +1,32 @@
+Cliente web -> navegador web (chrome: necesita pedir información a un servidor)
+Servidor web -> Apache (devuelve información al cliente web)
+
+Socket ->
+    * Protocolos de transporte que tenemos: TCP y UDP (hay que especificar cuál queremos usar) [se usa ¿afnt?]
+        devuelve un descriptor de archivo, lo podemos usar para tuberías
+    * Hay que especificara a qué dirección web quieres conectarlo
+    * Hay que especificar a qué puerto tiene que conectarse
+
+IP para conectarse en local?: 127.0.0.1
+
+
+El puerto 80: es el de http
+El puerto 443: es el de https
+
+
+*Servidor -> Crea un Socket 
+*Bind -> une el servidor al socket
+*Listen -> cuántos clientes voy a estar atendiendo a la vez
+*Accept -> hace que el servidor quedé bloqueado hasta que un cliente se conecte
+
+*Cliente -> Crea un socket
+*Connecet -> se conecta al servidor
+
+El cliente se ha conectado al servidor (accept entonces se ejecuta y el servidor deja de estar bloqueado).
+
+Después del accept hacemos un fork del servidor y este hijo es el encargado de tratar con el cliente.
+De esta forma el padre(servidor) se queda a la espera de un nuevo cliente.
+
+Ahora respecto al hijo y cliente:
+    * El hijo hace read y el cliente write mediante tuberías.
+    * Luego viceversa
