@@ -1,0 +1,189 @@
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+0
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+0
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+miércoles 29 de enero de 2025:Evento 44[reuniones]:Descripción del evento 44
+sábado 15 de febrero de 2025:Evento 69[deporte]:Descripción del evento 69
+lunes 24 de febrero de 2025:Evento 95[docencia]:Descripción del evento 95
+martes 25 de febrero de 2025:Evento 55[deporte]:Descripción del evento 55
+viernes 28 de marzo de 2025:Evento 89[deporte]:Descripción del evento 89
+lunes 14 de julio de 2025:Evento 56[deporte]:Descripción del evento 56
+martes 22 de julio de 2025:Evento 0[deporte]:Descripción del evento 0
+domingo 3 de agosto de 2025:Evento 45[deporte]:Descripción del evento 45
+sábado 1 de noviembre de 2025:Evento 70[deporte]:Descripción del evento 70
+martes 16 de diciembre de 2025:Evento 21[citas médicas]:Descripción del evento 21
+viernes 2 de enero de 2026:Evento 68[docencia]:Descripción del evento 68
+domingo 8 de febrero de 2026:Evento 54[deporte]:Descripción del evento 54
+martes 10 de febrero de 2026:Evento 85[citas médicas]:Descripción del evento 85
+martes 17 de febrero de 2026:Evento 97[docencia]:Descripción del evento 97
+martes 3 de marzo de 2026:Evento 3[citas médicas]:Descripción del evento 3
+martes 7 de abril de 2026:Evento 39[reuniones]:Descripción del evento 39
+sábado 30 de mayo de 2026:Evento 67[docencia]:Descripción del evento 67
+sábado 5 de septiembre de 2026:Evento 81[deporte]:Descripción del evento 81
+domingo 15 de noviembre de 2026:Evento 6[citas médicas]:Descripción del evento 6
+lunes 12 de abril de 2027:Evento 77[deporte]:Descripción del evento 77
+viernes 23 de abril de 2027:Evento 36[deporte]:Descripción del evento 36
+domingo 25 de abril de 2027:Evento 57[docencia]:Descripción del evento 57
+sábado 22 de mayo de 2027:Evento 78[reuniones]:Descripción del evento 78
+martes 15 de junio de 2027:Evento 26[deporte]:Descripción del evento 26
+domingo 5 de septiembre de 2027:Evento 49[deporte]:Descripción del evento 49
+domingo 19 de septiembre de 2027:Evento 80[deporte]:Descripción del evento 80
+martes 5 de octubre de 2027:Evento 10[citas médicas]:Descripción del evento 10
+jueves 2 de diciembre de 2027:Evento 19[docencia]:Descripción del evento 19
+viernes 10 de diciembre de 2027:Evento 86[deporte]:Descripción del evento 86
+domingo 19 de marzo de 2028:Evento 47[reuniones]:Descripción del evento 47
+viernes 24 de marzo de 2028:Evento 93[reuniones]:Descripción del evento 93
+domingo 2 de abril de 2028:Evento 73[deporte]:Descripción del evento 73
+viernes 5 de mayo de 2028:Evento 15[citas médicas]:Descripción del evento 15
+domingo 25 de junio de 2028:Evento 63[reuniones]:Descripción del evento 63
+domingo 6 de agosto de 2028:Evento 82[deporte]:Descripción del evento 82
+jueves 10 de agosto de 2028:Evento 18[citas médicas]:Descripción del evento 18
+martes 22 de agosto de 2028:Evento 61[docencia]:Descripción del evento 61
+jueves 18 de enero de 2029:Evento 83[reuniones]:Descripción del evento 83
+domingo 4 de febrero de 2029:Evento 51[deporte]:Descripción del evento 51
+jueves 5 de abril de 2029:Evento 84[citas médicas]:Descripción del evento 84
+martes 26 de junio de 2029:Evento 25[reuniones]:Descripción del evento 25
+domingo 29 de julio de 2029:Evento 43[citas médicas]:Descripción del evento 43
+jueves 2 de agosto de 2029:Evento 42[deporte]:Descripción del evento 42
+domingo 30 de septiembre de 2029:Evento 52[deporte]:Descripción del evento 52
+lunes 5 de noviembre de 2029:Evento 72[docencia]:Descripción del evento 72
+lunes 3 de diciembre de 2029:Evento 34[citas médicas]:Descripción del evento 34
+sábado 26 de enero de 2030:Evento 11[reuniones]:Descripción del evento 11
+sábado 2 de febrero de 2030:Evento 71[docencia]:Descripción del evento 71
+lunes 18 de febrero de 2030:Evento 38[docencia]:Descripción del evento 38
+domingo 28 de abril de 2030:Evento 58[docencia]:Descripción del evento 58
+martes 30 de abril de 2030:Evento 64[citas médicas]:Descripción del evento 64
+jueves 2 de mayo de 2030:Evento 88[reuniones]:Descripción del evento 88
+martes 28 de mayo de 2030:Evento 17[deporte]:Descripción del evento 17
+miércoles 26 de junio de 2030:Evento 98[docencia]:Descripción del evento 98
+miércoles 11 de septiembre de 2030:Evento 20[citas médicas]:Descripción del evento 20
+viernes 24 de enero de 2031:Evento 32[citas médicas]:Descripción del evento 32
+domingo 2 de marzo de 2031:Evento 46[docencia]:Descripción del evento 46
+domingo 30 de marzo de 2031:Evento 65[reuniones]:Descripción del evento 65
+lunes 12 de mayo de 2031:Evento 13[citas médicas]:Descripción del evento 13
+viernes 16 de mayo de 2031:Evento 8[deporte]:Descripción del evento 8
+jueves 29 de mayo de 2031:Evento 33[reuniones]:Descripción del evento 33
+domingo 28 de septiembre de 2031:Evento 48[citas médicas]:Descripción del evento 48
+lunes 29 de diciembre de 2031:Evento 1[reuniones]:Descripción del evento 1
+domingo 11 de enero de 2032:Evento 16[deporte]:Descripción del evento 16
+lunes 16 de febrero de 2032:Evento 41[docencia]:Descripción del evento 41
+viernes 5 de marzo de 2032:Evento 50[deporte]:Descripción del evento 50
+viernes 30 de julio de 2032:Evento 37[citas médicas]:Descripción del evento 37
+sábado 25 de septiembre de 2032:Evento 24[docencia]:Descripción del evento 24
+domingo 31 de octubre de 2032:Evento 30[citas médicas]:Descripción del evento 30
+martes 23 de noviembre de 2032:Evento 28[deporte]:Descripción del evento 28
+jueves 9 de diciembre de 2032:Evento 2[citas médicas]:Descripción del evento 2
+martes 17 de mayo de 2033:Evento 99[citas médicas]:Descripción del evento 99
+jueves 29 de septiembre de 2033:Evento 29[reuniones]:Descripción del evento 29
+martes 4 de octubre de 2033:Evento 4[docencia]:Descripción del evento 4
+jueves 15 de diciembre de 2033:Evento 40[citas médicas]:Descripción del evento 40
+domingo 25 de diciembre de 2033:Evento 27[deporte]:Descripción del evento 27
+jueves 29 de diciembre de 2033:Evento 87[reuniones]:Descripción del evento 87
+domingo 5 de febrero de 2034:Evento 96[citas médicas]:Descripción del evento 96
+viernes 5 de mayo de 2034:Evento 31[citas médicas]:Descripción del evento 31
+viernes 16 de junio de 2034:Evento 5[citas médicas]:Descripción del evento 5
+martes 3 de octubre de 2034:Evento 12[deporte]:Descripción del evento 12
+1
+5
+2
+2027
+1
+5
+9
+2029

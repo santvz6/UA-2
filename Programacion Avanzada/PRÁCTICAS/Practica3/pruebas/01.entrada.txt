@@ -1,0 +1,17 @@
+docencia
+deporte
+reuniones
+citas médicas
+[FIN_CATEGORIAS]
+insertarEvento 9 9 2024 Inicio_clases_Algoritmia Preparar_diapositivas 0
+insertarEvento 10 9 2024 Inicio_clases_PAED Preparar_práctica 0
+insertarEvento 14 9 2024 Salida_ciclista Con_el_club_ciclista_del_pueblo 1
+insertarEvento 22 11 2024 Vacuna_gripe No_olvidar_tarjeta_SIP 3
+insertarEvento 12 9 2024 Reunión_proyecto Preparar_resumen_tareas_último_año 2
+deshacerInsercion
+eliminarEvento 12 9 2024
+eliminarEvento 9 9 2024
+aCadena
+categoriaMasFrecuente
+comprobarEvento 12 9 2024
+[FIN]

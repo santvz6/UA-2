@@ -1,0 +1,52 @@
+Realizadas las tres ejecuciones de los distintos mapas hemos obtenido las siguientes medias para la cantidad de fallecidos:
+
+Media -> Original: 101.55
+Media -> GrandeSinDividir: 16.655
+Media -> GrandeDividida: 11.53
+
+Para realizar la hipotesis µ1 = µ2, tendremos que saber que no tenemos información de la varianza. 
+Por tanto, nuestras fórmulas de hipotesis se reducen a aquellas en las que desconocemos la varianza.
+Dentro de estas, tendremos que hacer una distinción comprobando si las varianzas son iguales o distintas.
+
+Para ello utilizaremos la hipotesis σ1 = σ2:
+
+    F(alfa/2, n1-1, n2-1)< S1 / S2 < F (1-alfa/2, n1-1, n2-1)
+
+Si se cumple dicha condición rechazamos la hipotesis.
+
+Ahora que sabemos si las varianzas son iguales o distintas, podremos realizar el cálculo de la correspondiente
+hipotesis para la media.
+
+Si la varianza es igual utilizamos:
+
+        (X1 - X2) / (Sd**0.5) * (((1/n1) + (1/n2))**0.5) > T((alfa/2, n1+n2-2))
+
+        donde Sd es igual a: ((n1-1)*S1 + (n2-1)*S2) / (n1+n2-2)
+
+
+Si la varianza es distinta utilizamos:
+
+        (X1 - X2) / ((S1/n1) + (S2/n2)) ** 0.5 > T(alfa/2, g)
+
+        donde delta es iugal a:
+        delta =  ((n2-1)*(S2**0.5) - (n1-1)*(S1**0.5))**2 / ((n2-1)*S2 + (n1-1)*S1)
+
+        y g es igual a:
+        g = n1 + n2 - 2 - int(delta)
+
+De igual forma, si se cumple dicha condición rechazamos la hipotesis.
+
+Una vez realizado los correspondientes cálculos nuestro programa nos devolverá el siguiente resultado:
+    
+    Muestra 1 -> Original - SinDividir
+    Misma media: False | Misma varianza: True
+
+    Muestra 2 -> Dividida - SinDividir
+    Misma media: False | Misma varianza: True
+
+
+Respecto a las medias obtenidas podemos destacar la cantidad de fallecidos en cada caso. En el caso original, podremos ver
+una gran cantidad de fallecidos debido al poco tamaño que tiene nuestro mapa. En el caso de que el mapa sea grande y 
+no haya divisiones el número de fallecidos disminuye debido a que ahora existe una mayor distancia entre cada persona. 
+Por último, en el caso de que dividamos el mapa grande la cantidad disminuye todavía más debido a que la probabilidad
+de infectar el otro barrio es muy baja.
