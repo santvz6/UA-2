@@ -10,7 +10,7 @@ class Fecha{
         bool esBisiesto(int ) const;
         int getMesCant(int, int );
         bool resetAtributos(int, int, int);
-        int getDiaSemana() const;
+        
 
     public:
         //Constructor por defecto: inicializa la fecha a 1/1/1900
@@ -39,6 +39,8 @@ class Fecha{
         int getMes() const;
         //Devuelve el año
         int getAnyo() const;
+        // Devuelve el dia de la semana
+        int getDiaSemana() const;
         //Modifica el día: devuelve false si la fecha resultante es incorrecta
         bool setDia(int);
         //Modifica el mes: devuelve false si la fecha resultante es incorrecta

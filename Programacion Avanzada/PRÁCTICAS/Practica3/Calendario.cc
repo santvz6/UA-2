@@ -226,3 +226,33 @@
 
         return añoFrecuente;
     }
+
+    int Calendario::diaSemanaMasFrecuente() const{
+        map<int, int> frecuencia;
+
+        
+        for (auto it = eventos.begin(); it != eventos.end(); ++it) {
+            int diaSemana = it->first.getDiaSemana();
+            frecuencia[diaSemana]++;
+        }
+
+        int masFrecuente = -1;
+        int maxFrecuencia = 0;
+
+        
+        for (auto it = frecuencia.begin(); it != frecuencia.end(); ++it) {
+            if (it->second >= maxFrecuencia) {
+                maxFrecuencia = it->second;
+                masFrecuente = it->first;
+            }
+        }
+        return masFrecuente;
+    }
+
+    Evento Calendario::eventoPorPalabra(const string& palabra) const {
+        // {fecha: evento}
+        for (auto it = eventos.begin(); it != eventos.end(); ++it) {
+            if (it->second.getTitulo() == palabra) return it->second;
+        }
+        return Evento();
+    }

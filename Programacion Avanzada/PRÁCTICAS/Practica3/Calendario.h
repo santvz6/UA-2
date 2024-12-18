@@ -48,6 +48,9 @@ class Calendario{
         int diaMasFrecuente() const;
         int mesMasFrecuente() const;
         int anyoMasFrecuente() const;
+        int diaSemanaMasFrecuente() const;
+
+        Evento eventoPorPalabra(const string&) const;
 };
 
 #endif
