@@ -1,0 +1,25 @@
+INFO:equipo:Paquete Calle A asignado al repartidor 0.
+INFO:equipo:Paquete Calle B asignado al repartidor 0.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 0 no dispone de más capacidad de carga.
+INFO:equipo:Paquete Calle C asignado al repartidor 1.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 0 no dispone de más capacidad de carga.
+INFO:equipo:Paquete Calle D asignado al repartidor 1.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 0 no dispone de más capacidad de carga.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 1 no dispone de más capacidad de carga.
+INFO:equipo:Paquete Calle E asignado al repartidor 2.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 0 no dispone de más capacidad de carga.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 1 no dispone de más capacidad de carga.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 2 no dispone de más capacidad de carga.
+INFO:equipo:Paquete Calle F Calle G  asignado al repartidor 3.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 0 no dispone de más capacidad de carga.
+ERROR:repartidor:El repartidor no dispone de más capacidad de carga.
+INFO:equipo:Excepción: El repartidor 1 no dispone de más capacidad de carga.
+INFO:equipo:Paquete Calle H asignado al repartidor 2.
